@@ -4,11 +4,46 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Field Report Viewer</title>
+    <style>
+        .data-box {
+            border: 1px solid black;
+            margin: 10px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        .horizontal-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+        }
+        .vertical-container {
+            margin-top: 10px;
+        }
+        .key {
+            color: #008080;
+            font-weight: bold;
+        }
+        .sub-key {
+            color: #800080;
+        }
+        .coordinates {
+            background-color: #add8e6;
+        }
+        .weather {
+            background-color: #90ee90;
+        }
+        .weather-sub-key {
+            background-color: #f0e68c;
+            margin: 5px;
+            padding: 5px;
+        }
+    </style>
 </head>
 <body>
     <h1>Field Report Viewer</h1>
     <button id="fetchReportButton">Fetch Field Report</button>
-    <div id="reportData"></div>
+    <div id="reportData" class="horizontal-container"></div>
 
     <script>
         const endpointUrl = 'https://us-central1-farmbase-b2f7e.cloudfunctions.net/getFarmerData';
@@ -33,20 +68,29 @@
 
                 let dataHTML = '';
                 for (const key in responseData) {
-                    if (typeof responseData[key] === 'object') {
-                        dataHTML += `<p><strong>${key}:</strong></p>`;
+                    if (key === 'Coordinates' || key === 'Weather') {
+                        let boxClass = key === 'Coordinates' ? 'coordinates' : 'weather';
+                        dataHTML += `<div class="${boxClass}"><span class="key">${key}:</span><div class="horizontal-container">`;
                         for (const subKey in responseData[key]) {
                             if (typeof responseData[key][subKey] === 'object') {
-                                dataHTML += `<p><strong>${subKey}:</strong></p>`;
+                                dataHTML += `<div class="data-box weather-sub-key"><span class="sub-key">${subKey}:</span>`;
                                 for (const subSubKey in responseData[key][subKey]) {
                                     dataHTML += `<p>${subSubKey}: ${JSON.stringify(responseData[key][subKey][subSubKey], null, 2)}</p>`;
                                 }
+                                dataHTML += `</div>`;
                             } else {
                                 dataHTML += `<p>${subKey}: ${JSON.stringify(responseData[key][subKey], null, 2)}</p>`;
                             }
                         }
+                        dataHTML += `</div></div>`;
+                    } else if (typeof responseData[key] === 'object') {
+                        dataHTML += `<div class="data-box"><span class="key">${key}:</span><div class="vertical-container">`;
+                        for (const subKey in responseData[key]) {
+                            dataHTML += `<p>${subKey}: ${JSON.stringify(responseData[key][subKey], null, 2)}</p>`;
+                        }
+                        dataHTML += `</div></div>`;
                     } else {
-                        dataHTML += `<p><strong>${key}:</strong> ${responseData[key]}</p>`;
+                        dataHTML += `<div class="data-box"><span class="key">${key}:</span> ${responseData[key]}</div>`;
                     }
                 }
 
