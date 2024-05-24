@@ -41,8 +41,8 @@
     </style>
 </head>
 <body>
-    <h1>Field Report Viewer</h1>
-    <button id="fetchReportButton">Fetch Field Report</button>
+    <h1>Field Data</h1>
+    <!-- <button id="fetchReportButton">Fetch Field Report</button> -->
     <div id="reportData" class="horizontal-container"></div>
 
     <script>
@@ -52,7 +52,7 @@
             "FieldID": "1716531336290",
         };
 
-        document.getElementById('fetchReportButton').addEventListener('click', async () => {
+        async function fetchData() {
             try {
                 console.log('waiting for response')
                 const response = await fetch(endpointUrl, {
@@ -99,7 +99,11 @@
             } catch (error) {
                 console.error('An error occurred:', error);
             }
-        });
+        }
+
+        fetchData();
+
+        document.getElementById('fetchReportButton').addEventListener('click', fetchData);
     </script>
 </body>
 </html>
