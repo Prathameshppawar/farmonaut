@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Field Report Viewer</title>
+</head>
+<body>
+    <h1>Field Report Viewer</h1>
+    <button id="fetchReportButton">Fetch Field Report</button>
+    <div id="reportData"></div>
+
+    <script>
+        const endpointUrl = 'https://us-central1-farmbase-b2f7e.cloudfunctions.net/getFarmerData';
+        const bodyObj = {
+            "UID": "MqnpvOYBauWcr5HRSDgLrFctInC3",
+            "FieldID": "1716531336290",
+        };
+
+        document.getElementById('fetchReportButton').addEventListener('click', async () => {
+            try {
+                console.log('waiting for response')
+                const response = await fetch(endpointUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(bodyObj),
+                });
+                
+                const responseData = await response.json();
+                console.log(responseData)
+
+                let dataHTML = '';
+                for (const key in responseData) {
+                    if (typeof responseData[key] === 'object') {
+                        dataHTML += `<p><strong>${key}:</strong></p>`;
+                        for (const subKey in responseData[key]) {
+                            if (typeof responseData[key][subKey] === 'object') {
+                                dataHTML += `<p><strong>${subKey}:</strong></p>`;
+                                for (const subSubKey in responseData[key][subKey]) {
+                                    dataHTML += `<p>${subSubKey}: ${JSON.stringify(responseData[key][subKey][subSubKey], null, 2)}</p>`;
+                                }
+                            } else {
+                                dataHTML += `<p>${subKey}: ${JSON.stringify(responseData[key][subKey], null, 2)}</p>`;
+                            }
+                        }
+                    } else {
+                        dataHTML += `<p><strong>${key}:</strong> ${responseData[key]}</p>`;
+                    }
+                }
+
+                document.getElementById('reportData').innerHTML = dataHTML;
+
+            } catch (error) {
+                console.error('An error occurred:', error);
+            }
+        });
+    </script>
+</body>
+</html>
